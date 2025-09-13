@@ -5,14 +5,6 @@
   </p>
 </div>
 
-<p align="center">
-  <img alt="AWS" src="https://www.google.com/search?q=https://img.shields.io/badge/AWS-232F3E%3Fstyle%3Dfor-the-badge%26logo%3Damazon-aws%26logoColor%3Dwhite" />
-  <img alt="Terraform" src="https://www.google.com/search?q=https://img.shields.io/badge/Terraform-7B42BC%3Fstyle%3Dfor-the-badge%26logo%3Dterraform%26logoColor%3Dwhite" />
-  <img alt="Jenkins" src="https://www.google.com/search?q=https://img.shields.io/badge/Jenkins-D24939%3Fstyle%3Dfor-the-badge%26logo%3Djenkins%26logoColor%3Dwhite" />
-  <img alt="Docker" src="https://www.google.com/search?q=https://img.shields.io/badge/Docker-2496ED%3Fstyle%3Dfor-the-badge%26logo%3Ddocker%26logoColor%3Dwhite" />
-  <img alt="Node.js" src="https://www.google.com/search?q=https://img.shields.io/badge/Node.js-339933%3Fstyle%3Dfor-the-badge%26logo%3Dnodedotjs%26logoColor%3Dwhite" />
-</p>
-
 🎯 Project Overview
 The core objective is to architect a robust, scalable, and fully automated CI/CD pipeline that takes a source code change from a git push and deploys it to a live, containerized environment on AWS with zero manual intervention.
 
