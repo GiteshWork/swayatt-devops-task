@@ -1,0 +1,18 @@
+Node.js dependencies
+node_modules
+npm-debug.log
+
+Terraform state and cache files
+These should never be committed to version control
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+Terraform-generated SSH key
+This is a sensitive private key
+terraform/jenkins-key.pem
+
+General OS files
+.DS_Store
+Thumbs.db
