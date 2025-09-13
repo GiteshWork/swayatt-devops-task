@@ -34,7 +34,7 @@ pipeline {
                     echo "--- Building Docker image ---"
                     // The ECR_REPOSITORY_URL is now taken directly from the environment block
                     def dockerImage = docker.build("${env.ECR_REPOSITORY_URL}:${env.BUILD_NUMBER}", ".")
-                    
+                    dockerImage.tag('latest')
                     echo "--- Pushing image to ECR ---"
                     sh "aws ecr get-login-password --region ${env.AWS_REGION} | docker login --username AWS --password-stdin ${env.ECR_REPOSITORY_URL}"
                     dockerImage.push()
