@@ -1,61 +1,137 @@
-# Logo Server
+<div align="center">
+  <h1>🚀 Automated CI/CD Pipeline for a Node.js Application on AWS 🚀</h1>
+  <p>
+    This repository contains the submission for the DevOps Engineer task from Swayatt Drishtigochar Pvt. Ltd. It demonstrates a complete, production-grade CI/CD pipeline built to automate the deployment of a sample Node.js application, with the entire cloud infrastructure provisioned on <strong>AWS</strong> using <strong>Terraform</strong> and the pipeline orchestrated by <strong>Jenkins</strong>.
+  </p>
+</div>
 
-A simple Express.js web server that serves the Swayatt logo image.
+<p align="center">
+  <img alt="AWS" src="https://www.google.com/search?q=https://img.shields.io/badge/AWS-232F3E%3Fstyle%3Dfor-the-badge%26logo%3Damazon-aws%26logoColor%3Dwhite" />
+  <img alt="Terraform" src="https://www.google.com/search?q=https://img.shields.io/badge/Terraform-7B42BC%3Fstyle%3Dfor-the-badge%26logo%3Dterraform%26logoColor%3Dwhite" />
+  <img alt="Jenkins" src="https://www.google.com/search?q=https://img.shields.io/badge/Jenkins-D24939%3Fstyle%3Dfor-the-badge%26logo%3Djenkins%26logoColor%3Dwhite" />
+  <img alt="Docker" src="https://www.google.com/search?q=https://img.shields.io/badge/Docker-2496ED%3Fstyle%3Dfor-the-badge%26logo%3Ddocker%26logoColor%3Dwhite" />
+  <img alt="Node.js" src="https://www.google.com/search?q=https://img.shields.io/badge/Node.js-339933%3Fstyle%3Dfor-the-badge%26logo%3Dnodedotjs%26logoColor%3Dwhite" />
+</p>
 
-## What is this app?
+🎯 Project Overview
+The core objective is to architect a robust, scalable, and fully automated CI/CD pipeline that takes a source code change from a git push and deploys it to a live, containerized environment on AWS with zero manual intervention.
 
-This is a lightweight Node.js application built with Express.js that serves a single logo image (`logoswayatt.png`) when accessed through a web browser. When you visit the root URL, the server responds by displaying the Swayatt logo.
+This project demonstrates a deep, hands-on understanding of modern DevOps best practices:
 
-## Prerequisites
+🏗️ Infrastructure as Code (IaC): The entire cloud environment is defined and managed with Terraform for consistency and repeatability.
 
-- Node.js (version 12 or higher)
-- npm (Node Package Manager)
+📜 Pipeline as Code: The CI/CD workflow is defined in a Jenkinsfile, versioned alongside the application code.
 
-## Installation
+📦 Containerization: The application is packaged into a lightweight, secure, multi-stage Docker image.
 
-1. Clone or download this repository
-2. Navigate to the project directory:
-   ```bash
-   cd "devops task"
-   ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
+🔐 Secure Credential Management: AWS IAM Roles are used to grant permissions to Jenkins, eliminating the need for static secret keys.
 
-## How to Start the App
+📊 Centralized Logging: Application logs are automatically shipped to AWS CloudWatch for real-time monitoring and debugging.
 
-Run the following command:
-```bash
-npm start
-```
+⚙️ Pipeline Flow Explained
+The entire process is orchestrated by a Jenkins pipeline defined in the Jenkinsfile. The pipeline is automatically triggered when changes are pushed to the dev branch.
 
-The server will start and display:
-```
-Server running on http://localhost:3000
-```
+Stage 1: Checkout ეტ
+The pipeline begins by cleaning the workspace to ensure a fresh build.
 
-## Usage
+It then checks out the latest source code from the dev branch of the GitHub repository.
 
-Once the server is running, open your web browser and navigate to:
-```
-http://localhost:3000
-```
+Stage 2: Build 🔧
+This stage prepares the Node.js application for containerization.
 
-You will see the Swayatt logo displayed in your browser.
+It runs npm install to download all required application dependencies.
 
-## Project Structure
+(Note: In a production scenario, this stage would also run unit and integration tests.)
 
-```
-├── app.js              # Main server file
-├── package.json        # Project dependencies and scripts
-├── logoswayatt.png     # Logo image file
-└── README.md          # This file
-```
+Stage 3: Dockerize and Push 📦
+This stage packages the application into a Docker image and stores it in a secure registry.
 
-## Technical Details
+Build: A new Docker image is built using the multi-stage Dockerfile to create a small, optimized final artifact.
 
-- **Framework**: Express.js
-- **Port**: 3000
-- **Endpoint**: GET `/` - serves the logo image
-- **File served**: `logoswayatt.png`
+Tag: The image is tagged twice: with the unique Jenkins build number (e.g., :8) for version tracking, and with a stable latest tag for the deployment environment.
+
+Push: Jenkins securely logs into AWS Elastic Container Registry (ECR) using its attached IAM Role and pushes both image tags to the private repository.
+
+Stage 4: Deploy to ECS 🚀
+In the final stage, the new version of the application goes live.
+
+The pipeline runs an AWS CLI command to update the Elastic Container Service (ECS).
+
+It instructs the service to perform a force new deployment, which tells ECS to pull the :latest image from ECR and launch a new container, replacing the old version with zero downtime.
+
+🚀 Setup & Deployment Instructions
+This entire environment is managed by Terraform, allowing for a one-command setup.
+
+Prerequisites
+An AWS Account with configured credentials (aws configure).
+
+Terraform CLI installed (v1.0.0+).
+
+Git installed.
+
+Step-by-Step Guide
+1. Clone the Repository
+git clone [https://github.com/GiteshWork/swayatt-devops-task.git](https://github.com/GiteshWork/swayatt-devops-task.git)
+cd swayatt-devops-task
+
+2. Deploy the AWS Infrastructure
+This step provisions the VPC, Jenkins server on EC2, ECR repository, and the ECS Fargate cluster. The process takes approximately 5-10 minutes.
+
+cd terraform
+terraform init
+terraform apply --auto-approve
+
+After completion, Terraform will output the public IP address of the Jenkins server.
+
+3. Configure and Run the Jenkins Pipeline
+Access Jenkins: Open your browser and navigate to http://<YOUR_JENKINS_IP>:8080.
+
+Unlock Jenkins: Get the initial password from the server by running:
+
+# You will need the jenkins-key.pem file generated by Terraform
+ssh -i jenkins-key.pem ubuntu@<YOUR_JENKINS_IP>
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+Complete Setup: In the Jenkins UI, paste the password, install suggested plugins, and create your admin user.
+
+Create the Pipeline Job:
+
+Click "New Item" -> Name it devops-task-pipeline -> Select "Pipeline".
+
+In the configuration, under "Pipeline", select "Pipeline script from SCM".
+
+Set SCM to "Git".
+
+Set Repository URL to this project's GitHub URL.
+
+Set Branch Specifier to */dev.
+
+Save the job.
+
+Run the build: On the pipeline page, click "Build Now".
+
+📈 Monitoring & Logging
+This project uses native AWS services for monitoring and logging, configured automatically via Terraform.
+
+How to View Application Logs
+All logs (stdout and stderr) from the running Node.js application container are automatically captured and sent to AWS CloudWatch Logs.
+
+Navigate to the CloudWatch service in the AWS Console.
+
+Go to Log groups and select the /ecs/devops-task-app log group.
+
+Click on the most recent log stream to view the live output from your application container.
+
+How to View Service Metrics
+Basic performance metrics (CPU and Memory Utilization) for the ECS service are available in AWS CloudWatch Metrics.
+
+Navigate to the ECS service in the AWS Console.
+
+Select the devops-task-cluster, then the devops-task-service.
+
+Click on the "Metrics" tab to see performance graphs.
+
+🧹 Final Cleanup
+To avoid ongoing AWS costs, you can destroy all the resources created by this project with a single command from the terraform directory:
+
+terraform destroy --auto-approve
