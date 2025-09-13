@@ -31,17 +31,26 @@ pipeline {
         stage('Dockerize and Push') {
             steps {
                 script {
-                    echo "--- Building Docker image ---"
-                    // The ECR_REPOSITORY_URL is now taken directly from the environment block
-                    def dockerImage = docker.build("${env.ECR_REPOSITORY_URL}:${env.BUILD_NUMBER}", ".")
-                    dockerImage.tag('latest')
-                    echo "--- Pushing image to ECR ---"
+                    echo "--- Building, Tagging, and Pushing Docker image ---"
+                    
+                    // 1. Build the image with the unique build number tag
+                    sh "docker build -t ${env.ECR_REPOSITORY_URL}:${env.BUILD_NUMBER} ."
+                    
+                    // 2. Explicitly add the 'latest' tag to the image we just built
+                    sh "docker tag ${env.ECR_REPOSITORY_URL}:${env.BUILD_NUMBER} ${env.ECR_REPOSITORY_URL}:latest"
+                    
+                    // 3. Log in to AWS ECR
                     sh "aws ecr get-login-password --region ${env.AWS_REGION} | docker login --username AWS --password-stdin ${env.ECR_REPOSITORY_URL}"
-                    dockerImage.push()
+                    
+                    // 4. Push the unique build number tag
+                    sh "docker push ${env.ECR_REPOSITORY_URL}:${env.BUILD_NUMBER}"
+                    
+                    // 5. Push the 'latest' tag
+                    sh "docker push ${env.ECR_REPOSITORY_URL}:latest"
                 }
             }
         }
-
+        
         stage('Deploy to ECS') {
             steps {
                 script {
